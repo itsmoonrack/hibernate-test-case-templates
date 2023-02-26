@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-access="field" default-cascade="all">
+    <class name="event.StoredEvent" table="stored_event" lazy="true">
+        <id name="eventId" type="long" column="event_id" unsaved-value="-1">
+            <generator class="identity" />
+        </id>
+        <component name="event" class="port.adapter.persistence.hibernate.DomainEventUserType">
+            <!-- I was expecting mapping would have been done on the "projection embeddable" -->
+            <property name="eventBody" column="event_body"/>
+            <property name="typeName" column="type_name"/>
+        </component>
+        <property name="typeName" column="type_name" insert="false" update="false"/>
+        <property name="occurredOn" column="occurred_on"/>
+    </class>
+</hibernate-mapping>

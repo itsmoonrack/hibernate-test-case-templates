@@ -15,12 +15,19 @@
  */
 package org.hibernate.bugs;
 
+import event.StoredEvent;
+import event.StoredEventThatMayWork;
+import event.TestableDomainEvent;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.testing.junit4.BaseCoreFunctionalTestCase;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * This template demonstrates how to develop a test case for Hibernate ORM, using its built-in unit test framework.
@@ -46,14 +53,13 @@ public class ORMUnitTestCase extends BaseCoreFunctionalTestCase {
 	@Override
 	protected String[] getMappings() {
 		return new String[] {
-//				"Foo.hbm.xml",
-//				"Bar.hbm.xml"
+				"StoredEvent.hbm.xml",
 		};
 	}
 	// If those mappings reside somewhere other than resources/org/hibernate/test, change this.
 	@Override
 	protected String getBaseForMappings() {
-		return "org/hibernate/test/";
+		return "hibernate/";
 	}
 
 	// Add in any settings that are specific to your test.  See resources/hibernate.properties for the defaults.
@@ -68,11 +74,24 @@ public class ORMUnitTestCase extends BaseCoreFunctionalTestCase {
 
 	// Add your tests, using standard JUnit.
 	@Test
-	public void hhh123Test() throws Exception {
+	public void storedEventMappingTestNotWorking() throws Exception {
 		// BaseCoreFunctionalTestCase automatically creates the SessionFactory and provides the Session.
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
-		// Do stuff...
+
+		TestableDomainEvent event = new TestableDomainEvent(928, "test hibernate composite user type");
+
+		StoredEvent storedEvent = new StoredEvent(event);
+
+		s.save(storedEvent);
+		s.flush();
+		s.clear();
+
+		StoredEvent reconstructedStoredEvent =
+				s.createQuery("select e from StoredEvent e", StoredEvent.class).uniqueResult();
+
+		assertNotNull(reconstructedStoredEvent);
+		assertInstanceOf(TestableDomainEvent.class, reconstructedStoredEvent.event());
 		tx.commit();
 		s.close();
 	}
