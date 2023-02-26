@@ -1,6 +1,8 @@
 package event;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import domain.model.DomainEvent;
 import serializer.AbstractSerializer;
 

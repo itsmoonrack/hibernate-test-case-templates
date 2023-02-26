@@ -16,7 +16,6 @@
 package org.hibernate.bugs;
 
 import event.StoredEvent;
-import event.StoredEventThatMayWork;
 import event.TestableDomainEvent;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -24,7 +23,6 @@ import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.testing.junit4.BaseCoreFunctionalTestCase;
 import org.junit.Test;
-import port.adapter.persistence.hibernate.DomainEventThatMayWorkUserType;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -38,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * What's even better?  Fork hibernate-orm itself, add your test case directly to a module's unit tests, then
  * submit it as a PR!
  */
-public class ORMUnitTestCaseThatMayWork extends BaseCoreFunctionalTestCase {
+public class ORMUnitTestCaseWithSimpleUserType extends BaseCoreFunctionalTestCase {
 
 	// Add your entities here.
 	@Override
@@ -53,7 +51,7 @@ public class ORMUnitTestCaseThatMayWork extends BaseCoreFunctionalTestCase {
 	@Override
 	protected String[] getMappings() {
 		return new String[] {
-				"StoredEventThatMayWork.hbm.xml",
+				"StoredEventWithSimpleUserType.hbm.xml",
 		};
 	}
 	// If those mappings reside somewhere other than resources/org/hibernate/test, change this.
@@ -74,21 +72,21 @@ public class ORMUnitTestCaseThatMayWork extends BaseCoreFunctionalTestCase {
 
 	// Add your tests, using standard JUnit.
 	@Test
-	public void storedEventMappingTest() throws Exception {
+	public void storedEventMappingTestNotWorking() throws Exception {
 		// BaseCoreFunctionalTestCase automatically creates the SessionFactory and provides the Session.
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
 
 		TestableDomainEvent event = new TestableDomainEvent(928, "test hibernate composite user type");
 
-		StoredEventThatMayWork storedEvent = new StoredEventThatMayWork(event);
+		StoredEvent storedEvent = new StoredEvent(event);
 
 		s.save(storedEvent);
 		s.flush();
 		s.clear();
 
-		StoredEventThatMayWork reconstructedStoredEvent =
-				s.createQuery("select e from StoredEventThatMayWork e", StoredEventThatMayWork.class).uniqueResult();
+		StoredEvent reconstructedStoredEvent =
+				s.createQuery("select e from StoredEvent e", StoredEvent.class).uniqueResult();
 
 		assertNotNull(reconstructedStoredEvent);
 		assertInstanceOf(TestableDomainEvent.class, reconstructedStoredEvent.event());

@@ -6,39 +6,19 @@ import port.adapter.persistence.hibernate.DomainEventThatMayWorkUserType;
 
 import java.time.Instant;
 
-@CompositeTypeRegistration(embeddableClass = StoredEventThatMayWork.ComponentMapped.class, userType = DomainEventThatMayWorkUserType.class)
 public class StoredEventThatMayWork {
 
-    private ComponentMapped event;
+    private StoredEventMapped event;
     private long eventId;
     private Instant occurredOn;
 
     public StoredEventThatMayWork(final DomainEvent event) {
-        this.event = new ComponentMapped(event, event.getClass().getName());
+        this.event = new StoredEventMapped(event, event.getClass().getName());
         this.occurredOn = event.occurredOn();
     }
 
-    public static class ComponentMapped {
-
-        private DomainEvent eventBody;
-        private String typeName;
-
-        public ComponentMapped(final DomainEvent event, final String typeName) {
-            this.eventBody = event;
-            this.typeName = typeName;
-        }
-
-        public DomainEvent eventBody() {
-            return this.eventBody;
-        }
-
-        public String typeName() {
-            return this.typeName;
-        }
-    }
-
     public DomainEvent event() {
-        return this.event.eventBody;
+        return this.event.eventBody();
     }
 
     public long eventId() {
@@ -50,7 +30,7 @@ public class StoredEventThatMayWork {
     }
 
     public String typeName() {
-        return this.event.typeName;
+        return this.event.typeName();
     }
 
     protected StoredEventThatMayWork() {
