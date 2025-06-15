@@ -3,8 +3,8 @@ pipeline {
         label 'Worker&&Containers'
     }
     tools {
-        jdk 'OpenJDK 11 Latest'
-        maven 'Apache Maven 3.8'
+        jdk 'OpenJDK 17 Latest'
+        maven 'Apache Maven 3.9'
     }
     options {
         disableConcurrentBuilds(abortPrevious: true)
@@ -12,13 +12,13 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh "./ci/build-all.sh"
+                sh "mvn -B -q clean package -DskipTests=true"
             }
         }
-    }
-    post {
-        always {
-            zulipNotification smartNotification: 'disabled', stream: 'hibernate-infra', topic: 'activity'
+        stage('Test') {
+            steps {
+                sh "mvn -B verify"
+            }
         }
     }
 }
